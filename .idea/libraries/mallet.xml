@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="mallet">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../mallet-2.0.8/dist/mallet.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Tools/mallet-2.0.8/mallet-2.0.8/dist/mallet.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

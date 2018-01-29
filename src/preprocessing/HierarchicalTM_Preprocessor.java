@@ -6,21 +6,130 @@ import java.util.Scanner;
 
 public class HierarchicalTM_Preprocessor
 {
-    private String input;
-    private String output;
     private String currentLine;
+
+    //Argument variables
+    private boolean keep_files = false,
+                    separate_files = false;
+    private String[] delimiters = null,
+                     keep = null;
+    private String  input = null,
+                    output = null;
 
     /**
      * Argument listing:
-     * keep_files TRUE/FALSE || 1/0 (default true): Decides whether to keep the files after processing or not
-     * delimiters XXXX,YYYY,ZZZZ (default null): The delimiters used in the splitting of the files and the extraction of the data, separated by commas
-     * keep XXXX,YYYY,ZZZZ (default null): The content of the delimiters, which's data should be used in the run (pushed into files)
-     * separate_files TRUE/FALSE || 1/0 (default false): Defines whether to separate delimiter content or not into different files for the analysis
+     * --keep_files TRUE/FALSE || 1/0 (default false): Defines whether to keep the files after processing or not
+     * --separate_files TRUE/FALSE || 1/0 (default false): Defines whether to separate delimiter content or not into different files for the analysis
      *
+     * --delimiters XXXX,YYYY,ZZZZ (default null): The delimiters used in the splitting of the files and the extraction of the data, separated by commas
+     * --keep XXXX,YYYY,ZZZZ (default null): The content of the delimiters, which's data should be used in the run (pushed into files)
+     *
+     * --input XXXX (default null -> throws Exception): Defines input file
+     * --output XXXX (default input-filename_X.htmpp input-filename = name of input file, X = number of output): Defines output files, which will hold data
      */
 
-    public HierarchicalTM_Preprocessor(String input, String ouput, String[] stringArgs, boolean[] boolArgs)
+    public HierarchicalTM_Preprocessor(String[] stringArgs)
     {
+        String arg;
+
+        //Reading arguments in arbitrary order
+
+        for(int iterator = 0; iterator < stringArgs.length; iterator++)
+        {
+            arg = stringArgs[iterator];
+
+            switch (arg)
+            {
+                case "--keep_files":
+                {
+                    if(iterator + 1 < stringArgs.length)
+                    {
+                        switch(stringArgs[++iterator].toLowerCase())
+                        {
+                            case "true":
+                            case "1":
+                            {
+                                keep_files = true;
+                                break;
+                            }
+                            case "false":
+                            case "0":
+                            {
+                                keep_files = false;
+                                break;
+                            }
+
+                        }
+                    }
+
+                    break;
+
+                }
+                case "--separate_files":
+                {
+                    if(iterator + 1 < stringArgs.length)
+                    {
+                        switch(stringArgs[++iterator].toLowerCase())
+                        {
+                            case "true":
+                            case "1":
+                            {
+                                separate_files = true;
+                                break;
+                            }
+                            case "false":
+                            case "0":
+                            {
+                                separate_files = false;
+                                break;
+                            }
+
+                        }
+                    }
+
+                    break;
+
+                }
+                case "--delimiters":
+                {
+                    if(iterator + 1 < stringArgs.length)
+                    {
+                        delimiters = stringArgs[++iterator].split(",");
+                    }
+                    break;
+                }
+                case "--keep":
+                {
+                    if(iterator + 1 < stringArgs.length)
+                    {
+                        keep = stringArgs[++iterator].split(",");
+                        if(delimiters == null || keep.length > delimiters.length) {
+                            throw new IllegalArgumentException("The number of delimiters to keep is higher than the number of actual delimiters");
+                        }
+                    }
+                    break;
+                }
+                case "--input":
+                {
+                    if(iterator + 1 < stringArgs.length)
+                        input = stringArgs[++iterator];
+                    break;
+                }
+                case "--output":
+                {
+                    if(iterator + 1 < stringArgs.length)
+                        output = stringArgs[++iterator];
+                    break;
+                }
+                default:
+                {
+                    HTMPP_Utilities.printHelp("unknown argument");
+                }
+            }
+        }
+
+        arg = null;
+
 
     }
 
