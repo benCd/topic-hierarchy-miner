@@ -4,37 +4,45 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
-public class Preproc
+public class HierarchicalTM_Preprocessor
 {
-    public static void main(String[] args) {
+    private String input;
+    private String output;
+    private String currentLine;
 
-        String fn = "/home/ben/Documents/Research/so-soft-eng/Posts.xml";
+    /**
+     * Argument listing:
+     * keep_files TRUE/FALSE || 1/0 (default true): Decides whether to keep the files after processing or not
+     * delimiters XXXX,YYYY,ZZZZ (default null): The delimiters used in the splitting of the files and the extraction of the data, separated by commas
+     * keep XXXX,YYYY,ZZZZ (default null): The content of the delimiters, which's data should be used in the run (pushed into files)
+     * separate_files TRUE/FALSE || 1/0 (default false): Defines whether to separate delimiter content or not into different files for the analysis
+     *
+     */
 
-        ArrayList<String> strings = createString(fn);
-        ArrayList<String[]> stringArrays = processLines(strings);
-        characterManagement(stringArrays);
+    public HierarchicalTM_Preprocessor(String input, String ouput, String[] stringArgs, boolean[] boolArgs)
+    {
+
     }
 
-    private static ArrayList<String> createString(String file)
+    public ArrayList<String> createString()
     {
         ArrayList<String> out = new ArrayList<>();
 
         try
         {
-            Scanner get = new Scanner(new BufferedReader(new FileReader(new File(file))));
+            Scanner get = new Scanner(new BufferedReader(new FileReader(new File(input))));
 
             while(get.hasNextLine())
                 out.add(get.nextLine());
         }
         catch (FileNotFoundException e)
         {
-            System.out.println(file + " was not found!");
+            System.out.println(input + " was not found!");
         }
         return out;
     }
 
-    private static ArrayList<String[]> processLines(ArrayList<String> list)
+    public ArrayList<String[]> processLines(ArrayList<String> list)
     {
         ArrayList<String[]> out = new ArrayList<>();
         String line;
@@ -43,7 +51,7 @@ public class Preproc
         for(int i = 0; i < list.size(); i++)
         {
             line = list.get(i);
-            if(line.contains("row"))
+            if(line.contains("<row>"))
             {
                 out.add(line.split(" Body="));
             }
@@ -51,7 +59,7 @@ public class Preproc
         return out;
     }
 
-    private static void characterManagement(ArrayList<String[]> list)
+    public void characterManagement(ArrayList<String[]> list)
     {
         final int SIZE = list.size();
         String[] temp;
@@ -75,7 +83,7 @@ public class Preproc
         }
     }
 
-    private static void outPutFiles(String path, String filename)
+    private void outPutFiles(String path, String filename)
     {
         BufferedWriter write;
 
