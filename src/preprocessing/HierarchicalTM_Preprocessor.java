@@ -2,6 +2,7 @@ package preprocessing;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 import java.util.Scanner;
 
 public class HierarchicalTM_Preprocessor
@@ -19,7 +20,7 @@ public class HierarchicalTM_Preprocessor
     /**
      * Argument listing:
      * --keep_files TRUE/FALSE || 1/0 (default false): Defines whether to keep the files after processing or not
-     * --separate_files TRUE/FALSE || 1/0 (default false): Defines whether to separate delimiter content or not into different files for the analysis
+     * --separate_files TRUE/FALSE || 1/0 (default false): Defines whether to separate delimiter content into different files for the analysis or not
      *
      * --delimiters XXXX,YYYY,ZZZZ (default null): The delimiters used in the splitting of the files and the extraction of the data, separated by commas
      * --keep XXXX,YYYY,ZZZZ (default null): The content of the delimiters, which's data should be used in the run (pushed into files)
@@ -124,8 +125,12 @@ public class HierarchicalTM_Preprocessor
                 default:
                 {
                     HTMPP_Utilities.printHelp("unknown argument");
+                    break;
                 }
             }
+
+            if(input == null)
+                throw new IllegalStateException("Input is null");
         }
 
         arg = null;
@@ -151,48 +156,127 @@ public class HierarchicalTM_Preprocessor
         return out;
     }
 
-    public ArrayList<String[]> processLines(ArrayList<String> list)
+    public void process()
     {
-        ArrayList<String[]> out = new ArrayList<>();
-        String line;
-        String temp[];
+        File file = new File(input);
+        File[] files;
+        String path = file.getPath();
 
-        for(int i = 0; i < list.size(); i++)
+        if(file.isDirectory())
         {
-            line = list.get(i);
-            if(line.contains("<row>"))
+            files = file.listFiles();
+
+            for(File f : files)
             {
-                out.add(line.split(" Body="));
+                process(f);
+            }
+        }
+        else
+        {
+            process(file);
+        }
+    }
+
+    private void process(File file)
+    {
+        try
+        {
+            Scanner get = new Scanner(file);
+
+            String[] lineArray;
+
+            while(get.hasNext())
+            {
+                currentLine = get.nextLine();
+                lineArray = processLineDelimiters(currentLine);
+                characterManagement(lineArray);
+
+            }
+        }
+        catch(FileNotFoundException fnfe)
+        {
+            System.out.println(file.getName() + " not found!");
+        }
+    }
+
+
+    public String[] processLineDelimiters(String line)
+    {
+        String[] out = {line};
+
+        if(delimiters != null)
+        {
+            if(keep != null) {
+
+                int i = 0;
+                out = new String[keep.length + 1];
+
+                String[] tempArr;
+
+                for(String delimiter : keep)
+                {
+                    tempArr = line.split(delimiter, 2);
+                    if(tempArr[1] != null)
+                    {
+                        if(tempArr[1].charAt(0) == '\"')
+                        {
+                            tempArr[1] = tempArr[1].replaceFirst("\"", "");
+                            out[i] = tempArr[1].split("\"",2)[0];
+                            if(out[i] == null)
+                                throw new IllegalStateException("Formatted string not ending or not recognized");
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                out = new String[delimiters.length + 1];
+
+                int i = 0;
+
+                String[] tempArr;
+
+                for(String delimiter : delimiters)
+                {
+                    tempArr = line.split(delimiter, 2);
+                    if(tempArr[1] != null)
+                    {
+                        if(tempArr[1].charAt(0) == '\"')
+                        {
+                            tempArr[1] = tempArr[1].replaceFirst("\"", "");
+                            out[i] = tempArr[1].split("\"",2)[0];
+                            if(out[i] == null)
+                                throw new IllegalStateException("Formatted string not ending or not recognized");
+                        }
+                    }
+                }
             }
         }
         return out;
     }
 
-    public void characterManagement(ArrayList<String[]> list)
+    public void characterManagement(String[] line)
     {
-        final int SIZE = list.size();
+        final int SIZE = line.length;
         String[] temp;
-        Scanner get;
 
         for(int i = 0; i < SIZE; i++)
         {
-            temp = list.get(i);
-            temp[1] = temp[1].replaceAll("&lt;", "<");
-            temp[1] = temp[1].replaceAll("&gt;", ">");
-            temp[1] = temp[1].replaceAll("&#xA;", "");
-            temp[1] = temp[1].replaceAll("&quot;", "");
-            temp[1] = temp[1].replaceAll("&amp;", "&");
-            temp[1] = temp[1].replaceAll("\"", "");
-            temp[1] = temp[1].replaceAll("\\.", "");
-            temp[1] = temp[1].replaceAll(",", "");
-            temp[1] = temp[1].replaceAll(":", "");
-            temp[1] = temp[1].replaceAll(";", "");
-
-            list.set(i, temp);
+            line[i] = line[i].replaceAll("&lt;", "<");
+            line[i] = line[i].replaceAll("&gt;", ">");
+            line[i] = line[i].replaceAll("&#xA;", "");
+            line[i] = line[i].replaceAll("&quot;", "");
+            line[i] = line[i].replaceAll("&amp;", "&");
+            line[i] = line[i].replaceAll("\"", "");
+            line[i] = line[i].replaceAll("\\.", "");
+            line[i] = line[i].replaceAll(",", "");
+            line[i] = line[i].replaceAll(":", "");
+            line[i] = line[i].replaceAll(";", "");
         }
     }
 
-    private void outPutFiles(String path, String filename)
+    private void outputFiles(String path, String filename)
     {
         BufferedWriter write;
 
