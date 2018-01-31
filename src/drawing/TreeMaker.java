@@ -14,7 +14,6 @@ public class TreeMaker
 
     public TreeMaker(String name, String filepath)
     {
-
         if(filepath == null)
             throw new IllegalArgumentException("No file parsed!");
 
@@ -39,5 +38,12 @@ public class TreeMaker
         {
             System.out.println(ioex.getMessage());
         }
+    }
+
+    public DefaultTreeForTreeLayout<TextInBox> make()
+    {
+
+
+        return tree;
     }
 }
