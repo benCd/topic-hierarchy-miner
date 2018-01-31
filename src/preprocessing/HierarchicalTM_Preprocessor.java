@@ -2,7 +2,6 @@ package preprocessing;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.IllegalFormatException;
 import java.util.Scanner;
 
 public class HierarchicalTM_Preprocessor
@@ -15,7 +14,8 @@ public class HierarchicalTM_Preprocessor
     private String[] delimiters = null,
                      keep = null;
     private String  input = null,
-                    output = null;
+                    output = "temp";
+    private int outputNo = 0;
 
     /**
      * Argument listing:
@@ -125,14 +125,13 @@ public class HierarchicalTM_Preprocessor
                 default:
                 {
                     HTMPP_Utilities.printHelp("unknown argument");
-                    break;
                 }
             }
 
-            if(input == null)
-                throw new IllegalStateException("Input is null");
         }
 
+        if(input == null)
+            throw new IllegalStateException("Input is null");
         arg = null;
 
 
@@ -190,10 +189,10 @@ public class HierarchicalTM_Preprocessor
                 currentLine = get.nextLine();
                 lineArray = processLineDelimiters(currentLine);
                 characterManagement(lineArray);
-
+                outputFiles(lineArray);
             }
         }
-        catch(FileNotFoundException fnfe)
+        catch(FileNotFoundException fNFE)
         {
             System.out.println(file.getName() + " not found!");
         }
@@ -226,14 +225,20 @@ public class HierarchicalTM_Preprocessor
                                 throw new IllegalStateException("Formatted string not ending or not recognized");
                         }
                     }
+                    i++;
                 }
 
             }
             else
             {
-                out = new String[delimiters.length + 1];
-
                 int i = 0;
+                for(String k : delimiters)
+                    if(line.contains(k))
+                        i++;
+
+                out = new String[i];
+
+                i = 0;
 
                 String[] tempArr;
 
@@ -250,6 +255,7 @@ public class HierarchicalTM_Preprocessor
                                 throw new IllegalStateException("Formatted string not ending or not recognized");
                         }
                     }
+                    i++;
                 }
             }
         }
@@ -276,11 +282,42 @@ public class HierarchicalTM_Preprocessor
         }
     }
 
-    private void outputFiles(String path, String filename)
+    public void outputFiles(String[] lineArr)
     {
-        BufferedWriter write;
+        try {
+            File file = new File(output.concat("_" + outputNo + ".htmpp"));
+            file.createNewFile();
 
+            BufferedWriter write = new BufferedWriter(new FileWriter(file));
 
-        //write = new BufferedWriter(new FileWriter(new File(filename)));
+            if(!separate_files)
+            {
+                write.write("");
+
+                for(String toWrite : lineArr)
+                {
+                    write.append(toWrite);
+                }
+            }
+            else
+            {
+                for(String toWrite : lineArr) {
+
+                    write.write(toWrite);
+                    outputNo++;
+                    file = new File(output.concat("_" + outputNo + ".htmpp"));
+                    file.createNewFile();
+                    write = new BufferedWriter(new FileWriter(file));
+                }
+            }
+            write.flush();
+            write.close();
+            outputNo++;
+        }
+        catch(IOException exception)
+        {
+            //System.out.println("output file error " + exception.getMessage());
+
+        }
     }
 }
