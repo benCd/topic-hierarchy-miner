@@ -1,11 +1,15 @@
 package preprocessing;
 
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
+
+import cc.mallet.pipe.*;
+import cc.mallet.pipe.iterator.*;
+import cc.mallet.types.*;
 
 public class HTMPP_Piper
 {
-    private ArrayList<String> filenames;
-
     private HTMPP_Piper(String[] stringArgs)
     {
 

@@ -137,24 +137,6 @@ public class HierarchicalTM_Preprocessor
 
     }
 
-    public ArrayList<String> createString()
-    {
-        ArrayList<String> out = new ArrayList<>();
-
-        try
-        {
-            Scanner get = new Scanner(new BufferedReader(new FileReader(new File(input))));
-
-            while(get.hasNextLine())
-                out.add(get.nextLine());
-        }
-        catch (FileNotFoundException e)
-        {
-            System.out.println(input + " was not found!");
-        }
-        return out;
-    }
-
     public void process()
     {
         File file = new File(input);
@@ -316,8 +298,7 @@ public class HierarchicalTM_Preprocessor
         }
         catch(IOException exception)
         {
-            //System.out.println("output file error " + exception.getMessage());
-
+            System.out.println("output file error " + exception.getMessage());
         }
     }
 }
