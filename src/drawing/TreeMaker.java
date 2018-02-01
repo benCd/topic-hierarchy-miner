@@ -2,7 +2,6 @@ package drawing;
 
 import org.abego.treelayout.util.DefaultTreeForTreeLayout;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;

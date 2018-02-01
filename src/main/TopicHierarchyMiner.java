@@ -10,8 +10,7 @@ public class TopicHierarchyMiner
 {
     public static void main(String[] args)
     {
-        String test = "BODY=\"Hi how are you?\" TITLE=\"Hello World!\"";
-        String[] testArr = {"--delimiters", "BODY=,TITLE=", "--input", "test.xml"};
+        String[] testArr = {"--delimiters", "Title=", "--output", "/home/ben/Documents/Research/preprocessingTestTtitles2/out", "--input", "/home/ben/Documents/Research/so-soft-eng/Posts.xml"};
 
         HierarchicalTM_Preprocessor preprocessor= new HierarchicalTM_Preprocessor(testArr);
         preprocessor.process();

@@ -160,18 +160,36 @@ public class HierarchicalTM_Preprocessor
 
     private void process(File file)
     {
+
         try
         {
             Scanner get = new Scanner(file);
 
-            String[] lineArray;
+            String lineArray;
 
             while(get.hasNext())
             {
                 currentLine = get.nextLine();
+
+                boolean cont = true;
+
+                if(!currentLine.contains("<row"))
+                    continue;
+                for (String del: delimiters)
+                    cont = cont && currentLine.contains(del);
+
+                if(!cont)
+                    continue;
+
                 lineArray = processLineDelimiters(currentLine);
+
                 characterManagement(lineArray);
-                outputFiles(lineArray);
+
+                System.out.println(lineArray);
+
+                String[] pass = {lineArray};
+
+                outputFiles(pass);
             }
         }
         catch(FileNotFoundException fNFE)
@@ -181,8 +199,10 @@ public class HierarchicalTM_Preprocessor
     }
 
 
-    public String[] processLineDelimiters(String line)
+    public String processLineDelimiters(String line)
     {
+        //System.out.println(line);
+
         String[] out = {line};
 
         if(delimiters != null)
@@ -203,6 +223,7 @@ public class HierarchicalTM_Preprocessor
                         {
                             tempArr[1] = tempArr[1].replaceFirst("\"", "");
                             out[i] = tempArr[1].split("\"",2)[0];
+
                             if(out[i] == null)
                                 throw new IllegalStateException("Formatted string not ending or not recognized");
                         }
@@ -233,6 +254,7 @@ public class HierarchicalTM_Preprocessor
                         {
                             tempArr[1] = tempArr[1].replaceFirst("\"", "");
                             out[i] = tempArr[1].split("\"",2)[0];
+
                             if(out[i] == null)
                                 throw new IllegalStateException("Formatted string not ending or not recognized");
                         }
@@ -241,27 +263,25 @@ public class HierarchicalTM_Preprocessor
                 }
             }
         }
-        return out;
+
+        String output = String.join("",out);
+
+        return output;
     }
 
-    public void characterManagement(String[] line)
+    public void characterManagement(String line)
     {
-        final int SIZE = line.length;
-        String[] temp;
+        line = line.replaceAll("&lt;", "<");
+        line = line.replaceAll("&gt;", ">");
+        line = line.replaceAll("&#xA;", "");
+        line = line.replaceAll("&quot;", "");
+        line = line.replaceAll("&amp;", "&");
+        line = line.replaceAll("\"", "");
+        line = line.replaceAll("\\.", "");
+        line = line.replaceAll(",", "");
+        line = line.replaceAll(":", "");
+        line = line.replaceAll(";", "");
 
-        for(int i = 0; i < SIZE; i++)
-        {
-            line[i] = line[i].replaceAll("&lt;", "<");
-            line[i] = line[i].replaceAll("&gt;", ">");
-            line[i] = line[i].replaceAll("&#xA;", "");
-            line[i] = line[i].replaceAll("&quot;", "");
-            line[i] = line[i].replaceAll("&amp;", "&");
-            line[i] = line[i].replaceAll("\"", "");
-            line[i] = line[i].replaceAll("\\.", "");
-            line[i] = line[i].replaceAll(",", "");
-            line[i] = line[i].replaceAll(":", "");
-            line[i] = line[i].replaceAll(";", "");
-        }
     }
 
     public void outputFiles(String[] lineArr)
